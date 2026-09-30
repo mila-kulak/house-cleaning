@@ -1,14 +1,13 @@
-class JunkItem:
-    def __init__(self, name:str, quantity:int, value:float):
-        self.name = name
-        self.quantity = quantity
-        self.value = value
+from repository import JunkRepository
+from item import JunkItem
 
 
-class JunkStorage:
+class FileJunkStorage(JunkRepository):
+    def __init__(self, filename:str):
+        self.filename = filename
 
     #Записує список предметів у файл у власному форматі CSV
-    def serialize(self, items: list[JunkItem], filename: str):
+    def save(self, items: list[JunkItem]) -> None:
         item_info_lines = []
         item_line=""
 
@@ -30,7 +29,7 @@ class JunkStorage:
 
         # Запис у файл
         try:
-            with open(filename, "w", encoding="utf-8") as file:
+            with open(self.filename, "w", encoding="utf-8") as file:
                 for line in item_info_lines:
                     file.write(line)
             print("Дані у файлик записані успішно ✅")
@@ -38,12 +37,13 @@ class JunkStorage:
         except OSError as e:
             print(f"Помилка роботи з файлом... {e}")
 
+
     #Читає та відновлює об'єкти JunkItem із файлу
-    def parse(self, filename: str) -> list[JunkItem]:
+    def load(self) -> list[JunkItem] | None:
         junk_items=[]
         lines_in_file=[]
         try:
-            with open(filename, "r", encoding="utf-8") as file:
+            with open(self.filename, "r", encoding="utf-8") as file:
                 for line in file:
                     lines_in_file.append(line)
 
